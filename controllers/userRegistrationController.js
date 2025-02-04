@@ -4,8 +4,8 @@ const jwt = require('jsonwebtoken');
 //time for expiry of token is 5 hours
 const expireAge = 5 * 60 * 60;
 
-const createToken = (id, email) => {
-    return jwt.sign({id, email}, 'Hum Jeet Gaye', {
+const createToken = (id, email, type) => {
+    return jwt.sign({id, email, type}, 'Hum Jeet Gaye', {
         expiresIn: expireAge
     });
 }
@@ -24,8 +24,9 @@ const decodeToken = async(req, res) => {
                 console.log(decodeToken);
 
                 const userId = decodedToken.id;
+                const userType = decodeToken.id;
 
-                res.status(201).json({msg: `${userId}`});
+                res.status(201).json({msg: `${userId}` `and` `${userType}`});
             } catch {
                 console.log('Failed to verify token:', err.message);
                 res.status(401).json({ error: 'Failed to verify token' });
@@ -44,6 +45,7 @@ const SignUp = async(req, res) => {
     try {
         const {
             Name,
+            Type,
             Age,
             Gender,
             Email,
@@ -55,6 +57,7 @@ const SignUp = async(req, res) => {
 
         const newUserRegistration = new userModel({
             Name,
+            Type,
             Age,
             Gender,
             Email,
@@ -96,7 +99,7 @@ const login = async(req, res) => {
         }
 
         if(password === User.Password){
-            const token = createToken(User._id, email);
+            const token = createToken(User._id, email, User.Type);
 
             res.cookie('jwt', token, { httpOnly: true, maxAge: expireAge * 1000 });
 
